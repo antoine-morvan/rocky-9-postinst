@@ -51,7 +51,11 @@ mkdir -p "${CACHE_DIR}"
 [ ! -f "${WINETRICKS_CACHE}" ] && echo "## -- Download to ${WINETRICKS_CACHE}" && curl -L -o "${WINETRICKS_CACHE}" "${WINETRICKS_URL}"
 [ ! -d "${BUILD_SCRIPT_DIR}/${WINETRICKS_FOLDER}" ] && echo "## -- Extract to ${BUILD_SCRIPT_DIR}/${WINETRICKS_FOLDER}" &&  tar xf "${WINETRICKS_CACHE}" -C "${BUILD_SCRIPT_DIR}"
 
-export CFLAGS="-O2 -march=native -mtune=native"
+# use gcc 14 too build wine (mingw is 14.2.1 already !)
+source /opt/rh/gcc-toolset-14/enable
+export CFLAGS="-O3 -pipe -march=native -mtune=native -ftree-vectorize -funroll-loops"
+export i386_CFLAGS="${CFLAGS}"
+export CROSSCFLAGS="${CFLAGS}"
 BUILD_PROC=20
 
 #####
@@ -68,7 +72,7 @@ date_start_64=$(date)
         --disable-tests \
         --enable-archs=i386,x86_64 \
         --enable-win64 \
-        CFLAGS="${CFLAGS}"
+        CFLAGS="${CFLAGS}" CROSSCFLAGS="${CFLAGS}" i386_CFLAGS="${CFLAGS}"
     make -j ${BUILD_PROC}
 )
 
@@ -83,7 +87,7 @@ date_start_32=$(date)
         --disable-tests \
         --enable-archs=i386,x86_64 \
         --with-wine64="${BUILD_64_DIR}" \
-        CFLAGS="${CFLAGS}"
+        CFLAGS="${CFLAGS}" CROSSCFLAGS="${CFLAGS}" i386_CFLAGS="${CFLAGS}"
     make -j ${BUILD_PROC}
 )
 
@@ -98,6 +102,7 @@ date_start_install=$(date)
     cp "${BUILD_SCRIPT_DIR}/${WINETRICKS_FOLDER}/src/winetricks" "${PACKAGE_PREFIX_DIR}/bin/winetricks"
     chmod +x "${PACKAGE_PREFIX_DIR}/bin/winetricks"
 )
+
 
 ################################################################################################################
 ## Exit
