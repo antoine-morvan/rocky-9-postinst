@@ -103,6 +103,27 @@ date_start_install=$(date)
     chmod +x "${PACKAGE_PREFIX_DIR}/bin/winetricks"
 )
 
+export WINEPREFIX="${HOME}/.wine"
+rm -rf "${WINEPREFIX}"
+"${PACKAGE_PREFIX_DIR}/bin/winecfg" /v win11
+
+# Install 7zip first and create link
+"${PACKAGE_PREFIX_DIR}/bin/winetricks" --force --unattended 7zip
+[ ! -h "${WINEPREFIX}"/'drive_c/Program Files (x86)/7-Zip' ] && ln -s "${WINEPREFIX}"/'drive_c/Program Files/7-Zip' "${WINEPREFIX}"/'drive_c/Program Files (x86)/7-Zip'
+
+"${PACKAGE_PREFIX_DIR}/bin/winetricks" --force --unattended \
+    comctl32ocx comdlg32ocx \
+    dotnet35sp1 dotnet48 \
+    vcrun2005 vb6run vcrun2010 vcrun2012 vcrun2013 vcrun2015 \
+    corefonts \
+    directx9 dxvk d3dx9 d3dx9_36 d3dx9_43 faudio gdiplus d3dcompiler_43 d3dcompiler_47 \
+    msxml3
+
+# "${PACKAGE_PREFIX_DIR}/bin/winetricks" --force --unattended allfonts # unnecessary
+
+# make sure to set win11 at the end
+"${PACKAGE_PREFIX_DIR}/bin/winecfg" /v win11
+
 
 ################################################################################################################
 ## Exit
