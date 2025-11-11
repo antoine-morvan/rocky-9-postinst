@@ -18,6 +18,13 @@ SETUP_SCRIPT_DIR=$(dirname $(readlink -f $BASH_SOURCE))
         nvidia-driver-cuda-libs nvidia-driver-libs libnvidia-ml libnvidia-fbc \
         nvidia-driver-cuda-libs.i686 nvidia-driver-libs.i686 libnvidia-ml.i686 libnvidia-fbc.i686
 
+
+    sudo dnf install -y --nogpgcheck https://mirrors.rpmfusion.org/free/el/rpmfusion-free-release-$(rpm -E %rhel).noarch.rpm
+    sudo dnf install -y --nogpgcheck https://mirrors.rpmfusion.org/nonfree/el/rpmfusion-nonfree-release-$(rpm -E %rhel).noarch.rpm
+    dnf makecache
+    sudo dnf install -y ffmpeg ffmpeg-devel --allowerasing
+
+
     sudo dnf install -y \
         gcc gcc-c++ automake autoconf libtool pkgconfig \
         cmake vim htop btop rsync geany git terminator firefox chromium byobu \
